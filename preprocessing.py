@@ -257,14 +257,9 @@ def compute_graph_features(G, node_list, node2idx, A, users, cheat_set, labeled_
     cheat_1hop   = np.array(A @ cheat_vec).ravel()
     labeled_1hop = np.array(A @ labeled_vec).ravel()
 
-    # 2-hop (chunked to avoid materializing A²)
-    chunk_size = 500
-    A2_cheat   = np.zeros(n, dtype=np.float32)
-    A2_labeled = np.zeros(n, dtype=np.float32)
-    for i in range(0, n, chunk_size):
-        chunk = A[i:i+chunk_size] @ A
-        A2_cheat[i:i+chunk_size]   = chunk @ cheat_vec
-        A2_labeled[i:i+chunk_size] = chunk @ labeled_vec
+    # 2-hop: A²v = A(Av) — two sparse mat-vec multiplies, no A² materialization
+    A2_cheat   = np.array(A @ (A @ cheat_vec)).ravel()
+    A2_labeled = np.array(A @ (A @ labeled_vec)).ravel()
 
     # ── Ghost-user features ───────────────────────────────────────────────────
     ghost_vec = np.zeros(n, dtype=np.float32)
