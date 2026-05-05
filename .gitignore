@@ -3,7 +3,14 @@ data/
 outputs/
 cheating_codebase.zip
 
-# Byte-compiled / optimized / DLL files
+# Old structure (deleted)
+src/
+scripts/
+configs/
+notebooks/
+catboost_info/
+
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
