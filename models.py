@@ -201,7 +201,7 @@ def train_oof(model, X, y, n_splits=N_SPLITS, cal_fraction=0.1):
         raw_cal = fold_model.predict_proba(X_cal_clean)[:, 1]
 
         cal = select_calibrator(np.asarray(y_cal), raw_cal)
-        oof_probs[val_idx] = cal.predict(raw_val)
+        oof_probs[val_idx] = np.clip(cal.predict(raw_val), 0.0, 1.0)
         print(f"  [fold {fold+1}/{n_splits}] OOF stored for {len(val_idx)} samples")
 
     # Final model on all data

@@ -94,17 +94,20 @@ def main():
 
     print(f"\n[pipeline] Feature matrix: {X_labeled.shape}  |  Cheating rate: {y_labeled.mean():.4f}")
 
+    # Guard against NaN/inf from ratio features or graph features
+    X_labeled = X_labeled.replace([np.inf, -np.inf], np.nan).fillna(0)
+    X_unlab   = X_unlab.replace([np.inf, -np.inf], np.nan).fillna(0)
+    X_test    = X_test.replace([np.inf, -np.inf], np.nan).fillna(0)
+
     # ──────────────────────────────────────────────────────────────────────────
     # 4. MODEL PROGRESSION
     # ──────────────────────────────────────────────────────────────────────────
     results = {}
 
-    # 4a. Logistic Regression (baseline)
     print("\n" + "="*60)
     print("[pipeline] 1/5  Logistic Regression (baseline)")
     print("="*60)
-    X_scaled, _, _ = scale_for_logistic(X_labeled.fillna(0), X_test.fillna(0))
-    lr_oof, lr_final = train_oof(build_logistic_regression(), X_scaled, y_labeled)
+    lr_oof, lr_final = train_oof(build_logistic_regression(), X_labeled.fillna(0), y_labeled)
     results["LogReg"] = evaluate_ensemble(y_labeled.values, lr_oof, "LogReg")
 
     # 4b. Decision Tree

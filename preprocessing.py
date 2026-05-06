@@ -262,15 +262,14 @@ def compute_graph_features(G, node_list, node2idx, A, users, cheat_set, labeled_
     A2_labeled = np.array(A @ (A @ labeled_vec)).ravel()
 
     # ── Ghost-user features ───────────────────────────────────────────────────
-    ghost_vec = np.zeros(n, dtype=np.float32)
-    for i, node in enumerate(node_list):
-        if node not in known_users:
-            ghost_vec[i] = 1.0
+    known_set = set(known_users)  # ensure O(1) lookup
+    ghost_vec = np.array([0.0 if node in known_set else 1.0 for node in node_list], dtype=np.float32)
     ghost_1hop = np.array(A @ ghost_vec).ravel()
     degree_arr = np.array(A.sum(axis=1)).ravel()
 
     # ── Louvain communities ───────────────────────────────────────────────────
-    print("[graph] Running Louvain community detection …")
+    t_louv = time.time()
+    print("[graph] Running Louvain community detection (this may take 5-10 min on full graph) …", flush=True)
     try:
         import community as community_louvain
         partition = community_louvain.best_partition(G, resolution=1.0)
